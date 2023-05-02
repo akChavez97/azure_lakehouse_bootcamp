@@ -1,0 +1,17 @@
+{
+	"name": "Create table sentence",
+	"properties": {
+		"content": {
+			"query": "-----------------------------------------------\n--Paso 01\n-----------------------------------------------\nSELECT TOP (10) *\nFrom OPENROWSET (BULK '/master/data/m_geo1.parquet',\nDATA_SOURCE= 'ExternalUPDataSource',\nFORMAT ='PARQUET')  AS [file]\nGO;\n\n-----------------------------------------------\n--Paso 02\n-----------------------------------------------\nCREATE EXTERNAL TABLE master_party.dim_geo(\n    Estimacion nvarchar(250),\n    Estatus nvarchar(250),\n    NombredeEstructura nvarchar(250),\n    FullYearBudget FLOAT,\n    BudgetYTDApril FLOAT,\n    ActualYTDApril FLOAT,\n    Detalle nvarchar(250),\n    Observacion nvarchar(250),\n    actualvsfullyear FLOAT,\n    actualvsbudget FLOAT\n)\n WITH (\n     LOCATION = '/master/data/m_geo1.parquet',\n     DATA_SOURCE = ExternalUPDataSource,  \n     FILE_FORMAT = UPParquetFileFormat\n )\nGO\n\n\n-----------------------------------------------\n--Paso 03\n-----------------------------------------------\nselect top(10) * from master_party.dim_geo\n\n-----------------------------------------------\n--Paso 04\n-----------------------------------------------\nCREATE EXTERNAL TABLE business_knowa.bi_geo \nWITH (\n    LOCATION = '/business/tf/bi_geo/',\n    DATA_SOURCE = ExternalUPDataSource,  \n    FILE_FORMAT = UPParquetFileFormat\n) AS \nSELECT * from master_party.dim_geo;\n\nSELECT * from business_knowa.bi_geo;\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "updatalakehouse",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
